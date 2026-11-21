@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d0b">
+  <title>Flow · 本地视频流</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-flow" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="3"/><path d="M7 2h10m-6.5 7.2 4.6 3.1-4.6 3.1z"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 8V6a2 2 0 0 1 2-2h5l2.3 3H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8h18"/></symbol>
+    <symbol id="i-add" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M3 7h5m5 0h8M3 17h10m5 0h3"/><circle cx="10.5" cy="7" r="2.5"/><circle cx="15.5" cy="17" r="2.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m7.5 4.8 11.8 7.2-11.8 7.2z" fill="currentColor" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="3.8" height="14" rx="1.4" fill="currentColor" stroke="none"/><rect x="13.7" y="5" width="3.8" height="14" rx="1.4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zM16 8c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zm13 1 5 5m0-5-5 5"/></symbol>
+    <symbol id="i-library" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M6 15h1m3 0h1"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 10a8 8 0 1 0-1 7m1-13v6h-6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-fast-forward" viewBox="0 0 24 24"><path d="m4 6.5 7 5.5-7 5.5zM13 6.5l7 5.5-7 5.5z" fill="currentColor" stroke-linejoin="round"/></symbol>
+    <symbol id="i-clean" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></symbol>
+    <symbol id="i-restore" viewBox="0 0 24 24"><path d="M9 4v4a1 1 0 0 1-1 1H4M15 4v4a1 1 0 0 0 1 1h4M9 20v-4a1 1 0 0 0-1-1H4M15 20v-4a1 1 0 0 1 1-1h4"/></symbol>
+  </svg>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <svg class="brandmark" viewBox="0 0 120 44" role="img" aria-label="FLOW">
+          <g transform="translate(10 1) skewX(-12)">
+            <path d="M0 0h109l-4 7H10v9h16l-3 7H10v13l-5 6H0Z"/>
+            <path d="M31 11h7v15h13l-3 6H31Z"/>
+            <path fill-rule="evenodd" d="M57 11h16l4 4v12l-5 5H55l-4-4V17Zm3 6-2 2v7h11l1-1v-8Z"/>
+            <path d="M79 11h7l1 13 6-10h5l2 10 5-13h7l-10 21h-7l-2-9-5 9h-7Z"/>
+          </g>
+        </svg>
+      </div>
+      <nav class="side-nav" aria-label="媒体库">
+        <button class="nav-item selected" data-mode="videos">
+          <svg><use href="#i-flow"/></svg>
+          <span class="nav-label">视频流</span>
+          <span class="nav-count" data-count="total">0</span>
+        </button>
+        <button class="nav-item" data-mode="images">
+          <svg><use href="#i-image"/></svg>
+          <span class="nav-label">图片流</span>
+        </button>
+      </nav>
+      <section class="side-folders">
+        <div class="side-heading">
+          <span>来源文件夹</span>
+          <button class="icon-button" data-open="folders" aria-label="引入文件夹" title="引入文件夹"><svg><use href="#i-add"/></svg></button>
+        </div>
+        <div id="source-list"></div>
+      </section>
+      <div class="side-footer">
+        <button class="settings-button" data-open="settings">
+          <svg><use href="#i-settings"/></svg>
+          <span>播放设置</span>
+          <span class="side-speed" id="side-speed">1×</span>
+        </button>
+      </div>
+    </aside>
+    <main>
+      <header class="header">
+        <div class="heading">
+          <button class="icon-button" id="sidebar-toggle" type="button" aria-controls="sidebar" aria-expanded="true" aria-label="收起侧栏" title="收起侧栏"><svg aria-hidden="true"><use href="#i-sidebar"/></svg></button>
+          <h1 id="view-title">视频流</h1>
+          <span class="header-meta" id="header-meta" hidden></span>
+        </div>
+        <div class="header-actions">
+          <button class="secondary" id="home-button" hidden><svg><use href="#i-left"/></svg>回到首页</button>
+          <button class="secondary" data-open="folders"><svg><use href="#i-folder"/></svg>引入文件夹</button>
+        </div>
+      </header>
+      <section class="stage empty" id="stage" aria-label="视频播放器" tabindex="0">
+        <button id="mode-switch" class="secondary"><svg aria-hidden="true"><use href="#i-image"/></svg><span>图片流</span></button>
+        <div class="mobile-topbar" id="mobile-topbar">
+          <div class="mobile-tabs" role="tablist" aria-label="视图切换">
+            <button class="mobile-tab" id="mobile-tab-videos" data-mobile-tab="videos" role="tab">视频流</button>
+            <button class="mobile-tab" id="mobile-tab-images" data-mobile-tab="images" role="tab">图片流</button>
+          </div>
+          <button class="mobile-folder-chip" id="mobile-folder-chip" hidden>
+            <svg aria-hidden="true"><use href="#i-folder"/></svg>
+            <span id="mobile-folder-name"></span>
+            <svg class="chip-close" aria-hidden="true"><use href="#i-close"/></svg>
+          </button>
+        </div>
+        <div id="image-layout" role="group" aria-label="同屏图片数" hidden>
+          <button type="button" data-images="1" aria-pressed="true">1 张</button>
+          <button type="button" data-images="2" aria-pressed="false">2 张</button>
+          <button type="button" data-images="4" aria-pressed="false">4 张</button>
+          <button type="button" data-images="8" aria-pressed="false">8 张</button>
+          <button type="button" data-images="16" aria-pressed="false">16 张</button>
+        </div>
+        <div class="screen" id="screen"><video id="player" playsinline preload="auto" hidden></video><div id="image-grid" data-size="1" hidden></div></div>
+        <div class="empty-view" id="empty-view">
+          <div class="film-art" aria-hidden="true">
+            <i class="film-back"></i>
+            <i class="film-front"><b>
+              <svg class="image-art" viewBox="0 0 32 24">
+                <circle cx="8" cy="6" r="3"/>
+                <path d="m1 22 9-12 5 6 7-11 9 17Z"/>
+              </svg>
+            </b></i>
+          </div>
+          <h2 id="empty-title">引入你的第一个文件夹</h2>
+          <p id="empty-hint" class="empty-hint">支持 MP4、MKV、MOV、AVI 与 TS 格式</p>
+          <div class="scan-bar" aria-hidden="true"><span></span></div>
+          <p id="empty-error" class="empty-error" hidden></p>
+          <button id="empty-action" class="primary"><svg><use href="#i-add"/></svg><span>选择文件夹</span></button>
+        </div>
+        <div id="video-ui" hidden>
+          <div class="subtitles" id="subtitles" dir="auto"></div>
+          <div id="playback-stats" class="playback-stats"></div>
+          <div id="hold-badge" class="hold-badge" hidden><svg aria-hidden="true"><use href="#i-fast-forward"/></svg><span id="hold-badge-text"></span></div>
+          <div id="swipe-hint" class="swipe-hint" aria-hidden="true" hidden></div>
+          <div id="scrub-hud" class="scrub-hud" aria-hidden="true" hidden>
+            <strong id="scrub-time">0:00</strong>
+            <span id="scrub-delta"></span>
+          </div>
+          <div id="zoom-hud" class="zoom-hud" aria-hidden="true" hidden>100%</div>
+          <div id="video-loading" class="video-loading" aria-hidden="true" hidden><span class="spinner"></span></div>
+          <div id="tap-feedback" class="tap-feedback" aria-hidden="true" hidden><svg><use href="#i-play"/></svg></div>
+          <div id="play-message" class="play-message" hidden><p></p><button class="secondary" id="retry">重新播放</button></div>
+          <button id="unmute-banner" class="unmute-banner" hidden><svg aria-hidden="true"><use href="#i-mute"/></svg><span>点击开启声音</span></button>
+          <button id="clean-exit" class="clean-exit" aria-label="退出清屏" title="退出清屏" hidden><svg aria-hidden="true"><use href="#i-restore"/></svg><span>退出清屏</span></button>
+        </div>
+        <div class="video-bar">
+          <div class="video-bar-top">
+            <div class="video-meta" id="video-meta">
+              <div class="video-name" id="video-name"></div>
+              <div class="video-badges" id="video-badges">
+                <span class="video-badge accent" id="joined-badge" hidden></span>
+                <span class="video-badge" id="timeline-progress" hidden></span>
+                <span class="video-meta-badges" id="video-meta-badges"></span>
+              </div>
+            </div>
+            <div class="stage-rail">
+              <button id="mobile-mute" class="rail-btn rail-video-only" aria-label="静音" title="静音">
+                <svg><use href="#i-volume"/></svg>
+                <span class="rail-label" id="mobile-mute-label">声音</span>
+              </button>
+              <button id="mobile-speed" class="rail-btn rail-video-only" data-open="settings" aria-label="倍速设置" title="倍速设置">
+                <span class="rail-speed-val" id="mobile-speed-val">1×</span>
+                <span class="rail-label">倍速</span>
+              </button>
+              <button id="mobile-clean" class="rail-btn" aria-label="清屏模式" title="清屏模式">
+                <svg><use href="#i-clean"/></svg>
+                <span class="rail-label">清屏</span>
+              </button>
+            </div>
+          </div>
+          <div class="seek-row">
+            <div class="seek-markers" id="seek-markers" aria-hidden="true" hidden></div>
+            <input id="seek" class="seek" type="range" aria-label="播放进度" min="0" max="1000" value="0">
+            <span class="seek-preview" id="seek-preview" aria-hidden="true" hidden></span>
+          </div>
+          <div class="transport">
+            <button id="play" class="icon-button" aria-label="播放"><svg><use href="#i-play"/></svg></button>
+            <button id="slideshow" class="secondary" hidden><svg aria-hidden="true"><use href="#i-play"/></svg><span>幻灯片播放</span></button>
+            <select id="slide-interval" class="secondary" aria-label="幻灯片切换间隔" title="幻灯片切换间隔" hidden>
+              <option value="0.5">0.5 秒</option>
+              <option value="1" selected>1 秒</option>
+              <option value="2">2 秒</option>
+              <option value="3">3 秒</option>
+              <option value="5">5 秒</option>
+            </select>
+            <span id="time">0:00</span><span class="spacer"></span>
+            <div class="video-switch">
+              <button class="icon-button" data-move="prev" aria-label="上一个视频" title="上一个视频"><svg aria-hidden="true"><use href="#i-left"/></svg></button>
+              <button class="icon-button" data-move="next" aria-label="下一个视频" title="下一个视频"><svg aria-hidden="true"><use href="#i-right"/></svg></button>
+            </div>
+            <nav class="mobile-nav" aria-label="主导航">
+              <button class="icon-button" id="mobile-source" title="切换文件夹" aria-label="切换文件夹" aria-haspopup="dialog" aria-controls="source-dialog" hidden>
+                <svg aria-hidden="true"><use href="#i-library"/></svg>
+              </button>
+              <button class="icon-button" data-open="folders" aria-label="引入文件夹" title="引入文件夹"><svg><use href="#i-folder"/></svg></button>
+              <button class="icon-button" data-open="settings" aria-label="播放设置" title="播放设置"><svg><use href="#i-settings"/></svg></button>
+            </nav>
+            <button class="speed-button" id="speed" data-open="settings">1×</button>
+            <button id="volume" class="icon-button" aria-label="静音"><svg><use href="#i-volume"/></svg></button>
+            <button id="fullscreen" class="icon-button desktop-fullscreen" aria-label="全屏" title="全屏"><svg><use href="#i-clean"/></svg></button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <dialog id="image-preview" aria-label="图片大图预览">
+    <img alt="">
+    <button class="secondary" type="button" data-close autofocus><svg aria-hidden="true"><use href="#i-close"/></svg>关闭</button>
+  </dialog>
+  <dialog id="source-dialog" aria-labelledby="source-dialog-title"><div class="dialog-inner">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="dialog-head"><h2 id="source-dialog-title">切换文件夹</h2><button class="icon-button" data-close aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+    <div class="folder-list source-choices" id="source-choices"></div>
+  </div></dialog>
+  <dialog id="folder-dialog"><div class="dialog-inner">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="dialog-head"><h2>引入文件夹</h2><button class="icon-button" data-close aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+    <form id="path-form">
+      <label for="folder-path">文件夹路径</label>
+      <div class="path-row"><input id="folder-path" placeholder="粘贴绝对路径或从下方浏览…" autocomplete="off" spellcheck="false"><button class="secondary" type="submit">打开</button></div>
+    </form>
+    <div class="folder-heading"><strong id="folder-heading">可选目录</strong><button id="parent-folder" class="text-button" hidden>上一级</button></div>
+    <div id="folder-list" class="folder-list"></div>
+    <p id="folder-error" class="error-text" role="alert" hidden></p>
+    <div class="dialog-actions"><button class="secondary" data-close>取消</button><button class="primary" id="import-folder" disabled>引入此文件夹</button></div>
+  </div></dialog>
+  <dialog id="settings-dialog"><div class="dialog-inner">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="dialog-head"><h2>播放设置</h2><button class="icon-button" data-close aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+    <fieldset class="setting-card">
+      <legend>文件夹播放</legend>
+      <button id="timeline-toggle" class="toggle-row" aria-pressed="true">
+        <span class="toggle-copy">
+          <strong>拼接播放</strong>
+          <small>将同子目录的多段视频合并为连续进度条</small>
+        </span>
+        <span class="toggle-switch" aria-hidden="true"></span>
+      </button>
+      <p id="timeline-status" class="setting-status" role="status" hidden></p>
+    </fieldset>
+    <fieldset id="zoom-setting" class="setting-card" hidden>
+      <legend class="zoom-legend"><label for="video-zoom">画面缩放</label> <output id="zoom-value" class="zoom-pill" for="video-zoom">100%</output></legend>
+      <input class="seek zoom-slider" id="video-zoom" type="range" min="100" max="300" step="5" value="100">
+    </fieldset>
+    <fieldset class="setting-card">
+      <legend>默认播放倍速</legend>
+      <div class="options" id="base-options"></div>
+    </fieldset>
+    <fieldset class="setting-card">
+      <legend>长按画面时的倍速</legend>
+      <div class="options" id="hold-options"></div>
+    </fieldset>
+    <fieldset class="setting-card">
+      <legend>界面显示</legend>
+      <button id="stats-toggle" class="toggle-row" aria-pressed="true">
+        <span class="toggle-copy">
+          <strong>显示实时码率</strong>
+          <small>在播放器左上角显示当前解码码率 (Mbps)</small>
+        </span>
+        <span class="toggle-switch" aria-hidden="true"></span>
+      </button>
+    </fieldset>
+    <div class="shortcut-hints" aria-label="快捷键提示">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 切换视频</span>
+      <span><kbd>Space</kbd> 播放/暂停</span>
+      <span><kbd>长按画面</kbd> 临时倍速</span>
+    </div>
+  </div></dialog>
+  <div id="toast" role="status" hidden></div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+*
+!Dockerfile
+!server.py
+!flow/
+!flow/*.py
+!web/
+!web/**

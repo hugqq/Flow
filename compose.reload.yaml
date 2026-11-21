@@ -1,0 +1,17 @@
+services:
+  flow:
+    environment:
+      FLOW_RELOAD: "1"
+    develop:
+      watch:
+        - action: sync
+          path: ./server.py
+          target: /app/server.py
+        - action: sync
+          path: ./flow
+          target: /app/flow
+          ignore:
+            - __pycache__/
+        - action: sync
+          path: ./web
+          target: /app/web

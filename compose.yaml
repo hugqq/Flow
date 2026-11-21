@@ -1,0 +1,17 @@
+services:
+  flow:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "28888:28888"
+    volumes:
+      - type: bind
+        source: ${FLOW_MEDIA_DIR:?请设置视频目录 FLOW_MEDIA_DIR}
+        target: /media
+        read_only: true
+        bind:
+          create_host_path: false
+      - flow-data:/data
+
+volumes:
+  flow-data:
