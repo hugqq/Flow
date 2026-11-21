@@ -44,7 +44,23 @@ python .\server.py --host 0.0.0.0 --root "D:\视频"
 
 `--root` 可以重复传入，用来限定允许浏览的目录。索引默认保存在项目的 `data` 目录，通过 `--data` 可以指定其他位置。
 
-### NAS / Docker Compose
+### NAS / Docker
+
+#### 一键启动
+
+在 NAS 终端运行下面的命令。先把 `/volume1/video` 换成实际存放视频和图片的目录。`/volume1/docker/flow/data` 用来保存 Flow 的索引，可以按需修改。
+
+```sh
+mkdir -p "/volume1/docker/flow/data" && docker run -d \
+  --name flow \
+  --restart unless-stopped \
+  -p 28888:28888 \
+  --mount "type=bind,source=/volume1/video,target=/media,readonly" \
+  --mount "type=bind,source=/volume1/docker/flow/data,target=/data" \
+  lqqai/flow:latest
+```
+
+#### 使用 Docker Compose
 
 在 NAS 上新建一个目录，将下面的内容保存为 `compose.yaml`。把 `/volume1/video` 换成 NAS 上实际的媒体目录。镜像仓库为 [Docker Hub 上的 lqqai/flow](https://hub.docker.com/r/lqqai/flow)。
 
